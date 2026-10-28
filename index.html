@@ -1,0 +1,240 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ماشین حساب XRgame</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #10141d;
+  font-family: Tahoma, Arial, sans-serif;
+  color: white;
+}
+
+.calculator {
+  width: 320px;
+  max-width: 95vw;
+  padding: 20px;
+  border-radius: 24px;
+  background: #1c2330;
+  box-shadow: 0 15px 40px #0006;
+}
+
+h2 {
+  text-align: center;
+  margin-top: 0;
+  color: #65e6a5;
+}
+
+#display {
+  width: 100%;
+  height: 85px;
+  margin-bottom: 15px;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  background: #0c1119;
+  color: white;
+  text-align: left;
+  font-size: 30px;
+  direction: ltr;
+  outline: none;
+}
+
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+}
+
+button {
+  height: 55px;
+  border: none;
+  border-radius: 12px;
+  background: #303b4d;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+button:active {
+  transform: scale(0.94);
+  filter: brightness(1.3);
+}
+
+.operator {
+  background: #176e65;
+}
+
+.clear {
+  background: #a53e4b;
+}
+
+.equal {
+  background: #20a66b;
+}
+
+footer {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 11px;
+  color: #8995a8;
+}
+</style>
+</head>
+
+<body>
+<div class="calculator">
+  <h2>XRgame Calc</h2>
+
+  <input id="display" value="0"
+         readonly aria-label="نمایشگر ماشین حساب">
+
+  <div class="buttons">
+    <button class="clear" onclick="clearAll()">C</button>
+    <button onclick="backspace()">⌫</button>
+    <button onclick="percent()">%</button>
+    <button class="operator" onclick="choose('/')">÷</button>
+
+    <button onclick="digit('7')">7</button>
+    <button onclick="digit('8')">8</button>
+    <button onclick="digit('9')">9</button>
+    <button class="operator" onclick="choose('*')">×</button>
+
+    <button onclick="digit('4')">4</button>
+    <button onclick="digit('5')">5</button>
+    <button onclick="digit('6')">6</button>
+    <button class="operator" onclick="choose('-')">−</button>
+
+    <button onclick="digit('1')">1</button>
+    <button onclick="digit('2')">2</button>
+    <button onclick="digit('3')">3</button>
+    <button class="operator" onclick="choose('+')">+</button>
+
+    <button onclick="sign()">±</button>
+    <button onclick="digit('0')">0</button>
+    <button onclick="decimal()">.</button>
+    <button class="equal" onclick="calculate()">=</button>
+  </div>
+
+  <footer>XRgame • Calculator</footer>
+</div>
+
+<script>
+const display = document.getElementById("display");
+
+let first = null;
+let operator = null;
+let fresh = true;
+
+function digit(n) {
+  if (fresh || display.value === "0" ||
+      display.value === "خطا") {
+    display.value = n;
+    fresh = false;
+  } else if (display.value.length < 15) {
+    display.value += n;
+  }
+}
+
+function decimal() {
+  if (fresh || display.value === "خطا") {
+    display.value = "0.";
+    fresh = false;
+  } else if (!display.value.includes(".")) {
+    display.value += ".";
+  }
+}
+
+function choose(op) {
+  if (display.value === "خطا") return;
+
+  if (operator !== null && !fresh) {
+    calculate();
+  }
+
+  first = Number(display.value);
+  operator = op;
+  fresh = true;
+}
+
+function calculate() {
+  if (operator === null || first === null) return;
+
+  const second = Number(display.value);
+  let result;
+
+  switch (operator) {
+    case "+": result = first + second; break;
+    case "-": result = first - second; break;
+    case "*": result = first * second; break;
+    case "/":
+      if (second === 0) {
+        display.value = "خطا";
+        first = null;
+        operator = null;
+        fresh = true;
+        return;
+      }
+      result = first / second;
+      break;
+  }
+
+  if (!Number.isFinite(result)) {
+    display.value = "خطا";
+  } else {
+    display.value = String(
+      Number(result.toPrecision(12))
+    );
+  }
+
+  first = null;
+  operator = null;
+  fresh = true;
+}
+
+function clearAll() {
+  display.value = "0";
+  first = null;
+  operator = null;
+  fresh = true;
+}
+
+function backspace() {
+  if (fresh || display.value === "خطا") {
+    display.value = "0";
+    fresh = false;
+    return;
+  }
+
+  display.value = display.value.slice(0, -1) || "0";
+}
+
+function percent() {
+  if (display.value !== "خطا") {
+    display.value = String(Number(display.value) / 100);
+    fresh = true;
+  }
+}
+
+function sign() {
+  if (display.value !== "0" &&
+      display.value !== "خطا") {
+    display.value = String(-Number(display.value));
+  }
+}
+</script>
+</body>
+</html>
